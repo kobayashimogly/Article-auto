@@ -8,6 +8,50 @@ import { createPrompt as createSectionPrompt } from "./generateArticleSection.js
 import { runGemini as runInitialGenerate } from "./generateArticleSection.js";
 
 // ====================================================
+// ✨ Gemini API用：503エラー指数バックオフリトライ
+// ====================================================
+async function safeGenerateContent(ai, request, maxRetries = 6) {
+  let delay = 1200; // 最初は1.2秒待つ
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await ai.models.generateContent(request);
+
+    } catch (err) {
+      const code = err?.error?.code;
+      const status = err?.error?.status;
+
+      // Gemini混雑（503）の場合のみ再試行
+      const isOverload =
+        code === 503 ||
+        status === "UNAVAILABLE" ||
+        (typeof err.message === "string" &&
+          err.message.includes("overloaded"));
+
+      if (!isOverload) {
+        // 他のエラーは即座に throw
+        throw err;
+      }
+
+      if (i === maxRetries - 1) {
+        console.error("❌ 最大リトライ回数に達しました。");
+        throw err;
+      }
+
+      console.warn(
+        `⚠️ Gemini 過負荷で失敗（503）。${delay}ms 待機して再試行します... (${i + 1}/${maxRetries})`
+      );
+
+      // 待機
+      await new Promise((resolve) => setTimeout(resolve, delay));
+
+      // 2倍ずつ増やす（指数バックオフ）
+      delay *= 2;
+    }
+  }
+}
+
+// ====================================================
 // ✨ JSONコードブロック除去
 // ====================================================
 function extractJson(text) {
@@ -87,7 +131,7 @@ async function runGeminiFix(prompt, keyword, index, iteration) {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   
     try {
-      const response = await ai.models.generateContent({
+      const response = await safeGenerateContent(ai, {
         model: "gemini-2.5-flash",
         contents: prompt,
         config: { responseMimeType: "application/json" },
