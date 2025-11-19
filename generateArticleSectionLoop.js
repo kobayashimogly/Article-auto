@@ -11,7 +11,7 @@ import { runGemini as runInitialGenerate } from "./generateArticleSection.js";
 // ✨ Gemini API用：503エラー指数バックオフリトライ
 // ====================================================
 async function safeGenerateContent(ai, request, maxRetries = 6) {
-  let delay = 3000; // 最初は1.2秒待つ
+  let delay = 30000; // 最初は1.2秒待つ
   
   for (let i = 0; i < maxRetries; i++) {
     try {
