@@ -148,7 +148,7 @@ async function runGeminiFix(prompt, keyword, index, iteration) {
       return outputFile;
     } catch (e) {
       console.error("❌ 修正生成エラー:", e);
-      throw e;
+      throw null;
     }
   }
 
