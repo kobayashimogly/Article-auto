@@ -6,6 +6,44 @@ import { execSync } from "child_process";
 import { load } from "cheerio";
 
 // =====================================================
+// ✨ Gemini API：503エラー指数バックオフつきリトライ
+// =====================================================
+async function safeGenerateContent(ai, request, maxRetries = 6) {
+  let delay = 1200; // 初期待ち時間（1.2秒）
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await ai.models.generateContent(request);
+
+    } catch (err) {
+      const code = err?.error?.code;
+      const status = err?.error?.status;
+      const isOverload =
+        code === 503 ||
+        status === "UNAVAILABLE" ||
+        (err?.message && err.message.includes("overloaded"));
+
+      // 503以外は即 throw
+      if (!isOverload) {
+        throw err;
+      }
+
+      if (i === maxRetries - 1) {
+        console.error("❌ 503: 最大リトライ回数に到達しました");
+        throw err;
+      }
+
+      console.warn(
+        `⚠️ Gemini過負荷 (503)。${delay}ms 待って再試行... (${i + 1}/${maxRetries})`
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay *= 2; // 指数バックオフ
+    }
+  }
+}
+
+// =====================================================
 // JSON・コードブロック除去
 // =====================================================
 function extractHtml(text) {
@@ -113,7 +151,7 @@ async function runGemini(prompt, outputFile) {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   try {
-    const response = await ai.models.generateContent({
+    const response = await safeGenerateContent(ai, {
       model: "gemini-2.5-flash",
       contents: prompt,
       // HTML生成なのでJSONモードはOFF。通常のテキストとして受け取る。
