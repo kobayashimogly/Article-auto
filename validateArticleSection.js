@@ -2,7 +2,7 @@
 import fs from "fs";
 
 // 禁止記号
-const NG_CHARS = ["”", "“", "「", "」", "*", "\""];
+const NG_CHARS = ["”", "“", "*", "\""];
 
 // 丁寧語チェック
 function endsWithPolite(text) {
