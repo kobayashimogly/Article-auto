@@ -3,8 +3,8 @@ name: Build Articles
 on:
   workflow_dispatch:
     inputs:
-      keyword_list:
-        description: "改行区切りのキーワード一覧"
+      keyword:
+        description: "記事キーワード（1つ）"
         required: true
         type: string
 
@@ -30,22 +30,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run All for each Keyword
+      - name: Run Builder for keyword
         run: |
-          echo "=== 📥 受け取ったキーワード一覧 ================="
-          echo "${{ github.event.inputs.keyword_list }}"
-          echo "================================================="
+          echo "=== 🚀 実行開始 ================================"
+          echo "Keyword: ${{ github.event.inputs.keyword }}"
+          echo "==============================================="
 
-          IFS=$'\n'
-          for KW in ${{ github.event.inputs.keyword_list }}; do
-            echo " "
-            echo "==============================================="
-            echo " 🚀 実行開始：$KW"
-            echo "==============================================="
+          node runAll.js "${{ github.event.inputs.keyword }}"
 
-            node runAll.js "$KW"
-
-            echo "-----------------------------------------------"
-            echo " ✔ 完了：$KW"
-            echo "-----------------------------------------------"
-          done
+          echo "-----------------------------------------------"
+          echo " ✔ 完了: ${{ github.event.inputs.keyword }}"
+          echo "-----------------------------------------------"
