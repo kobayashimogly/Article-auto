@@ -8,7 +8,7 @@ import { execSync } from "child_process";
 // ✨ Gemini API：503エラー指数バックオフつきリトライ
 // =====================================================
 async function safeGenerateContent(ai, request, maxRetries = 6) {
-  let delay = 1200;
+  let delay = 3000;
 
   for (let i = 0; i < maxRetries; i++) {
     try {
