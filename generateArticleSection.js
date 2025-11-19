@@ -4,6 +4,41 @@ import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import { execSync } from "child_process";
 
+// =====================================================
+// ✨ Gemini API：503エラー指数バックオフつきリトライ
+// =====================================================
+async function safeGenerateContent(ai, request, maxRetries = 6) {
+  let delay = 1200;
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await ai.models.generateContent(request);
+
+    } catch (err) {
+      const code = err?.error?.code;
+      const status = err?.error?.status;
+      const is503 =
+        code === 503 ||
+        status === "UNAVAILABLE" ||
+        (err?.message && err.message.includes("overloaded"));
+
+      if (!is503) throw err;
+
+      if (i === maxRetries - 1) {
+        console.error("❌ 初回生成が503で最大リトライに到達");
+        throw err;
+      }
+
+      console.warn(
+        `⚠️ 初回生成 503 → ${delay}ms 待機して再試行 (${i+1}/${maxRetries})`
+      );
+
+      await new Promise(res => setTimeout(res, delay));
+      delay *= 2;
+    }
+  }
+}
+
 // ====================================================
 // ✨ JSONコードブロック削除
 // ====================================================
@@ -97,7 +132,7 @@ export async function runGemini(prompt, keyword, index) {
   
     try {
       // 2. APIリクエスト
-      const response = await ai.models.generateContent({
+      const response = await safeGenerateContent(ai, {
         model: "gemini-2.5-flash", // 必要に応じて gemini-1.5-pro などに変更
         contents: prompt,
         config: {
