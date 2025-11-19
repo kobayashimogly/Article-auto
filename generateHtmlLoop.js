@@ -9,7 +9,7 @@ import { load } from "cheerio";
 // ✨ Gemini API：503エラー指数バックオフつきリトライ
 // =====================================================
 async function safeGenerateContent(ai, request, maxRetries = 6) {
-  let delay = 1200; // 初期待ち時間（1.2秒）
+  let delay = 30000; // 初期待ち時間（1.2秒）
 
   for (let i = 0; i < maxRetries; i++) {
     try {
