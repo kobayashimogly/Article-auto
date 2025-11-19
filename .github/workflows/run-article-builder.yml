@@ -1,0 +1,51 @@
+name: Build Articles
+
+on:
+  workflow_dispatch:
+    inputs:
+      keyword_list:
+        description: "改行区切りのキーワード一覧"
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run All for each Keyword
+        run: |
+          echo "=== 📥 受け取ったキーワード一覧 ================="
+          echo "${{ github.event.inputs.keyword_list }}"
+          echo "================================================="
+
+          IFS=$'\n'
+          for KW in ${{ github.event.inputs.keyword_list }}; do
+            echo " "
+            echo "==============================================="
+            echo " 🚀 実行開始：$KW"
+            echo "==============================================="
+
+            node runAll.js "$KW"
+
+            echo "-----------------------------------------------"
+            echo " ✔ 完了：$KW"
+            echo "-----------------------------------------------"
+          done
