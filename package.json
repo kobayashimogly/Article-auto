@@ -1,0 +1,17 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^1.29.1",
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2",
+    "dotenv": "^17.2.3",
+    "fs-extra": "^11.3.2",
+    "google-search-results-nodejs": "^2.1.0",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.10",
+    "playwright": "^1.56.1",
+    "puppeteer": "^24.30.0",
+    "sharp": "^0.34.5"
+  }
+}
