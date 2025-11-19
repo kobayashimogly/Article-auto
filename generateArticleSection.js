@@ -98,7 +98,7 @@ export async function runGemini(prompt, keyword, index) {
     try {
       // 2. APIリクエスト
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash", // 必要に応じて gemini-1.5-pro などに変更
+        model: "gemini-2.5-flash", // 必要に応じて gemini-1.5-pro などに変更
         contents: prompt,
         config: {
           responseMimeType: "application/json", // JSON出力を強制
