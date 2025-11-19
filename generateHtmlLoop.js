@@ -114,7 +114,7 @@ async function runGemini(prompt, outputFile) {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: prompt,
       // HTML生成なのでJSONモードはOFF。通常のテキストとして受け取る。
     });
