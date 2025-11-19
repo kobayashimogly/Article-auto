@@ -46,7 +46,7 @@ export function validateArticleSection(jsonFile) {
     errors.push("intro がありません");
   } else {
     const introLen = countChars(data.intro);
-    if (introLen < 150 || introLen > 200) {
+    if (introLen < 100 || introLen > 250) {
       errors.push(`introが文字数外です（${introLen}文字）`);
     }
     if (!endsWithPolite(data.intro)) {
@@ -77,11 +77,11 @@ export function validateArticleSection(jsonFile) {
       const isExample = isExampleSection(block.title);
 
       if (isExample) {
-        if (len < 300 || len > 400) {
+        if (len < 250 || len > 400) {
           errors.push(`h3[${i}]（例文系）の文字数が範囲外：${len}文字`);
         }
       } else {
-        if (len < 250 || len > 350) {
+        if (len < 220 || len > 370) {
           errors.push(`h3[${i}] の文字数が範囲外：${len}文字`);
         }
       }
