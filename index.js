@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 
-// ====== 共通：リトライ関数 ======
+// ====== 共通：リトライ関数（429対応版・指数バックオフ） ======
 async function retry(fn, maxAttempts = 5) {
   let lastError;
 
@@ -15,11 +15,22 @@ async function retry(fn, maxAttempts = 5) {
       return await fn();
     } catch (err) {
       lastError = err;
+      const is429 =
+        err?.message?.includes("429") ||
+        err?.status === 429 ||
+        err?.error?.status === "RESOURCE_EXHAUSTED";
+
       console.error(`❌ Error on attempt ${attempt}:`, err.message);
 
-      if (attempt < maxAttempts) {
-        console.log("↻ Retrying...");
-      }
+      if (attempt >= maxAttempts) break;
+
+      // 429 なら強めのバックオフ
+      const waitMs = is429
+        ? 30000 * Math.pow(2, attempt) // 1s → 2s → 4s → 8s...
+        : 10000 * attempt; // 通常エラーは軽い待機
+
+      console.log(`⏳ Waiting ${waitMs}ms before retry...`);
+      await new Promise((res) => setTimeout(res, waitMs));
     }
   }
 
