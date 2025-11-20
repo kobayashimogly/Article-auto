@@ -5,6 +5,11 @@ import fs from "fs";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 
+function loadFontBase64(fontPath) {
+  const fontBuffer = fs.readFileSync(fontPath);
+  return fontBuffer.toString("base64");
+}
+
 // ====== 共通：リトライ関数（429対応版・指数バックオフ） ======
 async function retry(fn, maxAttempts = 5) {
   let lastError;
@@ -87,21 +92,30 @@ function escapeXML(str) {
 function createTextSVG(text, width, height) {
   const lines = text.split(/\n/).map(escapeXML);
 
+  const fontBase64 = loadFontBase64("fonts/ShipporiAntique-Regular.ttf");
+
   return Buffer.from(`
-    <svg width="${width}" height="${height}">
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+
       <style>
-          text {
-            font-family: "Shippori Antique", sans-serif;
-            fill: #fff;
-            font-size: 40px;
-            font-weight: bold;
-            text-anchor: middle;
-          }
+        @font-face {
+          font-family: "ShipporiAntique";
+          src: url("data:font/ttf;base64,${fontBase64}") format("truetype");
+        }
+        text {
+          font-family: "ShipporiAntique";
+          fill: #fff;
+          font-size: 40px;
+          font-weight: bold;
+          text-anchor: middle;
+        }
       </style>
+
       <text x="${width / 2}" y="${height / 2}" dominant-baseline="middle">
         <tspan x="${width / 2}" dy="-30">${lines[0] || ""}</tspan>
         <tspan x="${width / 2}" dy="60">${lines[1] || ""}</tspan>
       </text>
+
     </svg>
   `);
 }
