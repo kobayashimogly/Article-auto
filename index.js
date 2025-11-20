@@ -92,16 +92,10 @@ function escapeXML(str) {
 function createTextSVG(text, width, height) {
   const lines = text.split(/\n/).map(escapeXML);
 
-  const fontBase64 = loadFontBase64("fonts/ShipporiAntique-Regular.ttf");
-
   return Buffer.from(`
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
 
       <style>
-        @font-face {
-          font-family: "ShipporiAntique";
-          src: url("data:font/ttf;base64,${fontBase64}") format("truetype");
-        }
         text {
           font-family: "ShipporiAntique";
           fill: #fff;
