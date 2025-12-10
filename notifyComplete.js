@@ -133,7 +133,7 @@ async function main() {
 
   const mailOptions = {
     from: user,
-    to: "g-1000017355-609894@mail.talknote.com",
+    to: "g-1000017355-693493@mail.talknote.com",
     subject: `【記事通知】${keyword}`,
     text: `
 　／
