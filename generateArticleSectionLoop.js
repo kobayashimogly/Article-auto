@@ -84,6 +84,7 @@ function createFixPrompt(keyword, originalJson, errors) {
 # 絶対ルール
 - JSONのみ出力する
 - 説明文・メタ発言禁止
+- 「MBTI」と言うkwを含めないでください。
 - 禁止記号（” “ 「 」 * "）は使わない
 - 丁寧語で終わる
 - 文末は必ず「〜です」「〜ます」で終えること
