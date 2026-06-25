@@ -129,7 +129,7 @@ async function runGemini(promptFile, keyword, index) {
   // 3. APIリクエスト
   // 現在のAPIでは "gemini-2.0-flash" や "gemini-1.5-pro" など有効なモデル名を指定してください。
   const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash", 
+    model: "gemini-2.5-flash", 
     contents: promptContent,
     config: {
       responseMimeType: "application/json", // JSON出力を強制させて精度を上げます
